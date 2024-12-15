@@ -4,7 +4,7 @@
     --text-primary: #333;
     --accent-color: #4CAF50;
     --error-color: #ff6b6b;
-    --shadow-color: rgba(0,0,0,0.1);
+    --shadow-color: rgba(0, 0, 0, 0.1);
 }
 
 [data-theme='dark'] {
@@ -12,7 +12,7 @@
     --bg-secondary: #1e1e1e;
     --text-primary: #e0e0e0;
     --accent-color: #81c784;
-    --shadow-color: rgba(255,255,255,0.1);
+    --shadow-color: rgba(255, 255, 255, 0.1);
 }
 
 * {
@@ -20,6 +20,37 @@
     padding: 0;
     box-sizing: border-box;
     transition: all 0.3s ease;
+}
+
+
+* {
+    scrollbar-color: rgb(76, 175, 80);
+}
+
+*::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+*::-webkit-scrollbar-track {
+    background: lightgray;
+    border-radius: 10px;
+    
+}
+
+
+*::-webkit-scrollbar-thumb {
+    background-color: rgb(129, 199, 132);
+    border-radius: 10px;
+    
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(93, 171, 105);
+}
+
+*::-webkit-scrollbar-track:hover {
+    background: rgba(211, 211, 211, 0.813);
 }
 
 body {
@@ -87,8 +118,13 @@ header {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .additional-info {
@@ -166,11 +202,11 @@ footer {
     transition: .4s;
 }
 
-input:checked + .slider {
+input:checked+.slider {
     background-color: var(--accent-color);
 }
 
-input:checked + .slider:before {
+input:checked+.slider:before {
     transform: translateX(26px);
 }
 
@@ -190,4 +226,72 @@ input:checked + .slider:before {
     #location-input {
         width: 100%;
     }
+}
+
+/* (Previous CSS remains the same, with these additions) */
+.suggestions-dropdown {
+    position: absolute;
+    top: 180px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--accent-color);
+    border-radius: 10px;
+    box-shadow: 0 4px 6px var(--shadow-color);
+    z-index: 1000;
+    display: none;
+}
+
+.suggestions-dropdown .suggestion-item {
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.suggestions-dropdown .suggestion-item:hover {
+    background-color: rgba(76, 175, 80, 0.1);
+}
+
+#geolocation-btn {
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    padding: 12px 15px;
+    margin-left: 10px;
+    border-radius: 25px;
+    cursor: pointer;
+}
+
+.forecast-preview {
+    margin-top: 20px;
+    background-color: var(--bg-secondary);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 6px var(--shadow-color);
+}
+
+.hourly-forecast-container {
+    display: flex;
+    overflow-x: auto;
+    gap: 15px;
+    padding: 10px 0;
+}
+
+.hourly-forecast-item {
+    min-width: 100px;
+    text-align: center;
+    background-color: var(--bg-primary);
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+.last-updated {
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    opacity: 0.7;
+    text-align: right;
 }

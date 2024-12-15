@@ -6,9 +6,13 @@ const BASE_URL = 'https://api.weatherapi.com/v1';
 const elements = {
     locationInput: document.getElementById('location-input'),
     searchBtn: document.getElementById('search-btn'),
+    geolocationBtn: document.getElementById('geolocation-btn'),
     weatherInfo: document.getElementById('weather-info'),
     errorMessage: document.getElementById('error-message'),
     loadingIndicator: document.getElementById('loading'),
+    locationSuggestions: document.getElementById('location-suggestions'),
+    hourlyForecast: document.getElementById('hourly-forecast'),
+    lastUpdated: document.getElementById('last-updated'),
     additionalInfo: {
         humidity: document.getElementById('humidity-info').querySelector('p'),
         wind: document.getElementById('wind-info').querySelector('p'),
@@ -17,6 +21,15 @@ const elements = {
     },
     themeToggle: document.getElementById('theme-toggle')
 };
+
+// Debounce function to limit API calls
+function debounce(func, delay) {
+    let timeoutId;
+    return function (...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(this, args), delay);
+    };
+}
 
 // Theme Management
 function initTheme() {
@@ -31,6 +44,52 @@ elements.themeToggle.addEventListener('change', () => {
     localStorage.setItem('theme', theme);
 });
 
+// Location Suggestions
+async function fetchLocationSuggestions(query) {
+    try {
+        const response = await fetch(`${BASE_URL}/search.json?key=${API_KEY}&q=${query}`);
+        const suggestions = await response.json();
+        
+        elements.locationSuggestions.innerHTML = suggestions.map(location => 
+            `<div class="suggestion-item" data-name="${location.name}, ${location.country}">
+                ${location.name}, ${location.country}
+            </div>`
+        ).join('');
+        
+        elements.locationSuggestions.style.display = suggestions.length ? 'block' : 'none';
+        
+        // Add click event to suggestions
+        document.querySelectorAll('.suggestion-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const locationName = e.target.getAttribute('data-name');
+                elements.locationInput.value = locationName;
+                elements.locationSuggestions.style.display = 'none';
+                fetchWeatherData(locationName);
+            });
+        });
+    } catch (error) {
+        console.error('Error fetching suggestions:', error);
+    }
+}
+
+// Geolocation
+function getUserLocation() {
+    if ("geolocation" in navigator) {
+        elements.loadingIndicator.style.display = 'block';
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const { latitude, longitude } = position.coords;
+                fetchWeatherData(`${latitude},${longitude}`);
+            },
+            (error) => {
+                handleError(new Error('Geolocation access denied or unavailable'));
+            }
+        );
+    } else {
+        handleError(new Error('Geolocation not supported'));
+    }
+}
+
 // Weather Data Fetching
 async function fetchWeatherData(location) {
     try {
@@ -41,19 +100,28 @@ async function fetchWeatherData(location) {
         
         // Reset additional info to default
         Object.values(elements.additionalInfo).forEach(el => el.textContent = '-');
+        elements.hourlyForecast.innerHTML = '';
 
-        const response = await fetch(`${BASE_URL}/current.json?key=${API_KEY}&q=${location}`);
+        // Fetch current weather and forecast
+        const [currentResponse, forecastResponse] = await Promise.all([
+            fetch(`${BASE_URL}/current.json?key=${API_KEY}&q=${location}`),
+            fetch(`${BASE_URL}/forecast.json?key=${API_KEY}&q=${location}&days=1&hours=24`)
+        ]);
         
-        if (!response.ok) {
+        if (!currentResponse.ok || !forecastResponse.ok) {
             throw new Error('Location not found');
         }
 
-        const data = await response.json();
-        displayWeatherData(data);
+        const currentData = await currentResponse.json();
+        const forecastData = await forecastResponse.json();
+        
+        displayWeatherData(currentData);
+        displayHourlyForecast(forecastData);
     } catch (error) {
         handleError(error);
     } finally {
         elements.loadingIndicator.style.display = 'none';
+        elements.lastUpdated.textContent = `Last Updated: ${new Date().toLocaleString()}`;
     }
 }
 
@@ -78,17 +146,30 @@ function displayWeatherData(data) {
     elements.additionalInfo.uv.textContent = current.uv;
 }
 
+function displayHourlyForecast(data) {
+    const hourlyData = data.forecast.forecastday[0].hour;
+    
+    elements.hourlyForecast.innerHTML = hourlyData.map(hour => `
+        <div class="hourly-forecast-item">
+            <div>${new Date(hour.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+            <img src="https:${hour.condition.icon}" alt="${hour.condition.text}" width="50">
+            <div>${hour.temp_c}°C</div>
+        </div>
+    `).join('');
+}
+
 function handleError(error) {
     elements.errorMessage.textContent = error.message || 'Unable to fetch weather data';
     
     // Reset weather info and additional info
     elements.weatherInfo.innerHTML = '<p class="placeholder-text">Search for a location to view weather details</p>';
     Object.values(elements.additionalInfo).forEach(el => el.textContent = '-');
+    elements.hourlyForecast.innerHTML = '';
 }
 
 // Event Listeners
 function initEventListeners() {
-    // Search button click
+    // Search functionality
     elements.searchBtn.addEventListener('click', () => {
         const location = elements.locationInput.value.trim();
         if (location) fetchWeatherData(location);
@@ -99,6 +180,30 @@ function initEventListeners() {
         if (e.key === 'Enter') {
             const location = elements.locationInput.value.trim();
             if (location) fetchWeatherData(location);
+        }
+    });
+
+    // Location suggestions
+    const debouncedSuggestions = debounce((query) => {
+        if (query.length > 2) {
+            fetchLocationSuggestions(query);
+        } else {
+            elements.locationSuggestions.style.display = 'none';
+        }
+    }, 300);
+
+    elements.locationInput.addEventListener('input', (e) => {
+        debouncedSuggestions(e.target.value);
+    });
+
+    // Geolocation
+    elements.geolocationBtn.addEventListener('click', getUserLocation);
+
+    // Close suggestions when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!elements.locationSuggestions.contains(e.target) && 
+            e.target !== elements.locationInput) {
+            elements.locationSuggestions.style.display = 'none';
         }
     });
 }
