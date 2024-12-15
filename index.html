@@ -3,20 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Country Weather Lookup</title>
+    <title>Global Weather Insights</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <h1>Country Weather Lookup</h1>
-    <div>
-        <input type="text" id="country-input" placeholder="Enter country name">
-        <button id="search-btn">Search</button>
-    </div>
-    <div id="error-message"></div>
-    <div id="weather-container">
-        <div id="weather-info">
-            <p>Enter a country name to get weather information</p>
-        </div>
+    <div class="container">
+        <header>
+            <h1>Global Weather Insights</h1>
+            <div class="search-container">
+                <input type="text" id="location-input" placeholder="Enter city or country">
+                <button id="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </header>
+
+        <div id="error-message" class="error"></div>
+
+        <main id="weather-container" class="weather-card">
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+            </div>
+            <div id="weather-info" class="weather-content">
+                <p class="placeholder-text">Search for a location to view weather details</p>
+            </div>
+        </main>
+
+        <section id="additional-info" class="additional-info">
+            <div class="info-grid">
+                <div class="info-card" id="humidity-info">
+                    <i class="fas fa-tint"></i>
+                    <span>Humidity</span>
+                    <p>-</p>
+                </div>
+                <div class="info-card" id="wind-info">
+                    <i class="fas fa-wind"></i>
+                    <span>Wind</span>
+                    <p>-</p>
+                </div>
+                <div class="info-card" id="pressure-info">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Pressure</span>
+                    <p>-</p>
+                </div>
+                <div class="info-card" id="uv-info">
+                    <i class="fas fa-sun"></i>
+                    <span>UV Index</span>
+                    <p>-</p>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>Weather data provided by WeatherAPI.com</p>
+            <div class="theme-toggle">
+                <label class="switch">
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="slider round"></span>
+                </label>
+                <span>Dark Mode</span>
+            </div>
+        </footer>
     </div>
 
     <script src="main.js"></script>
