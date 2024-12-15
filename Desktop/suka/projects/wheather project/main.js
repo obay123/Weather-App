@@ -13,7 +13,7 @@ searchBtn.addEventListener('click', () => {
         return;
     }
 
-    // Clear previous error and start loading
+    
     errorMessage.textContent = '';
     weatherInfo.innerHTML = '<p>Loading weather data...</p>';
 
@@ -26,11 +26,10 @@ searchBtn.addEventListener('click', () => {
             return response.json();
         })
         .then(data => {
-            // Extract relevant weather information
+          
             const location = data.location;
             const current = data.current;
 
-            // Update weather info display
             weatherInfo.innerHTML = `
                 <h2>${location.name}, ${location.country}</h2>
                 <p>Temperature: ${current.temp_c}°C / ${current.temp_f}°F</p>
@@ -41,13 +40,13 @@ searchBtn.addEventListener('click', () => {
             `;
         })
         .catch(error => {
-            // Handle errors
+   
             errorMessage.textContent = 'Unable to fetch weather data. Please check the country name.';
             weatherInfo.innerHTML = '<p>Enter a country name to get weather information</p>';
         });
 });
 
-// Allow searching by pressing Enter key
+
 countryInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
         searchBtn.click();
