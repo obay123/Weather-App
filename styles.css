@@ -188,7 +188,7 @@ footer {
     right: 0;
     bottom: 0;
     background-color: #ccc;
-    transition: .4s;
+    transition: .4s,
 }
 
 .slider:before {
@@ -228,10 +228,9 @@ input:checked+.slider:before {
     }
 }
 
-/* (Previous CSS remains the same, with these additions) */
 .suggestions-dropdown {
     position: absolute;
-    top: 180px;
+    top: 150px;
     left: 50%;
     transform: translateX(-50%);
     width: 300px;
