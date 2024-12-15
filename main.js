@@ -1,8 +1,7 @@
-// Configuration and API Details
 const API_KEY = '0268b42a2b304542a02194048242305';
 const BASE_URL = 'https://api.weatherapi.com/v1';
 
-// DOM Element Selectors
+
 const elements = {
     locationInput: document.getElementById('location-input'),
     searchBtn: document.getElementById('search-btn'),
